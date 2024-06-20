@@ -41,16 +41,18 @@ public class RestAssuredExercises7Test {
          * Store the user id in a variable of type int
          ******************************************************/
 
-            given().
-                spec(requestSpec).
-            when().
-            then();
+        int userId =
+                given().
+                        spec(requestSpec).
+                        when().
+                        get("/users").
+                        then().extract().path("find{it.username=='Karianne'}.id");
 
         /*******************************************************
          * Use a JUnit assertEquals to verify that the userId
          * is equal to 4
          ******************************************************/
-
+        assertEquals(4, userId);
 
 
         /*******************************************************
@@ -62,17 +64,21 @@ public class RestAssuredExercises7Test {
          * Store these in a variable of type List<Integer>.
          ******************************************************/
 
-            given().
-                spec(requestSpec).
-            when().
-            then();
+        List<Integer> albumIds =
+                given().
+                        spec(requestSpec).
+                        when().
+                        get("/albums").
+                        then().
+                        extract().
+                        path(String.format("findAll{it.userId==%d}.id", userId));
 
         /*******************************************************
          * Use a JUnit assertEquals to verify that the list has
          * exactly 10 items (hint: use the size() method)
          ******************************************************/
 
-
+        assertEquals(10, albumIds.size());
 
         /*******************************************************
          * Perform a GET to /albums/XYZ/photos, where XYZ is the
@@ -86,10 +92,12 @@ public class RestAssuredExercises7Test {
          * https://stackoverflow.com/questions/21725093/rest-assured-deserialize-response-json-as-listpojo
          * (the accepted answer should help you solve this one).
          ******************************************************/
-
-            given().
-                spec(requestSpec).
-            when();
+        List<Photo> photos = Arrays.asList(
+                given().
+                        spec(requestSpec).
+                        pathParam("albumId", albumIds.get(4)).
+                        when().get("/albums/{albumId}/photos").as(Photo[].class)
+        );
 
         /*******************************************************
          * Use a JUnit assertEquals to verify that the title of
@@ -99,6 +107,7 @@ public class RestAssuredExercises7Test {
          * specific index from a List
          ******************************************************/
 
+        assertEquals("pariatur sunt eveniet", photos.get(31).getTitle());
 
     }
 }

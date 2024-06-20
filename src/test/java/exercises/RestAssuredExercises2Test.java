@@ -1,15 +1,15 @@
 package exercises;
 
+
+import static io.restassured.RestAssured.*;
+import static org.hamcrest.Matchers.*;
+
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
 
 @WireMockTest(httpPort = 9876)
 public class RestAssuredExercises2Test {
@@ -47,42 +47,23 @@ public class RestAssuredExercises2Test {
      * respectively, to extract the required response body elements
      ******************************************************/
 
-    @Test
-    public void requestDataForCustomer12212_checkNames_expectJohnSmith() {
-
+    @ParameterizedTest
+    @CsvSource({
+            "12212, John, Smith",
+            "12323, Susan, Holmes",
+            "14545, Anna, Grant"
+    })
+    public void checkFirstNameAndLastNameForCustomerIDs(
+            int customerId, String expectedFirstName, String expectedLastName
+    ) {
         given().
-            spec(requestSpec).
-        when().
-            get("/customer/12212").
-        then().
-            assertThat().
-            body("firstName", equalTo("John")).
-            body("lastName", equalTo("Smith"));
-    }
-
-    @Test
-    public void requestDataForCustomer12323_checkNames_expectSusanHolmes() {
-
-        given().
-            spec(requestSpec).
-        when().
-            get("/customer/12323").
-        then().
-            assertThat().
-            body("firstName", equalTo("Susan")).
-            body("lastName", equalTo("Holmes"));
-    }
-
-    @Test
-    public void requestDataForCustomer14545_checkNames_expectAnnaGrant() {
-
-        given().
-            spec(requestSpec).
-        when().
-            get("/customer/14545").
-        then().
-            assertThat().
-            body("firstName", equalTo("Anna")).
-            body("lastName", equalTo("Grant"));
+                spec(requestSpec).
+                and().
+                pathParam("customerId", customerId).
+                when().get("/customer/{customerId}").
+                then().
+                assertThat().
+                body("firstName", equalTo(expectedFirstName)).
+                body("lastName", equalTo(expectedLastName));
     }
 }

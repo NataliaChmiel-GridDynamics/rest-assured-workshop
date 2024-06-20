@@ -39,9 +39,10 @@ public class RestAssuredExercises4Test {
     public void getAccountsForCustomer12212AsXml_checkIdOfFirstAccount_shouldBe12345() {
 
         given().
-            spec(requestSpec).
-        when().
-        then();
+                spec(requestSpec).
+                when().
+                get("/xml/customer/12212/accounts").
+                then().assertThat().body("accounts.account[0].id", equalTo("12345"));
     }
 
     /*******************************************************
@@ -60,9 +61,10 @@ public class RestAssuredExercises4Test {
     public void getAccountsForCustomer12212AsXml_checkBalanceOfThirdAccount_shouldBe4321() {
 
         given().
-            spec(requestSpec).
-        when().
-        then();
+                spec(requestSpec).
+                when().
+                get("/xml/customer/12212/accounts").
+                then().assertThat().body("accounts.account[2].balance", equalTo("43.21"));
     }
 
     /*******************************************************
@@ -80,16 +82,18 @@ public class RestAssuredExercises4Test {
     public void getAccountsForCustomer12212AsXml_checkNumberOfCheckingAccounts_shouldBe3() {
 
         given().
-            spec(requestSpec).
-        when().
-        then();
+                spec(requestSpec).
+                when().
+                get("/xml/customer/12212/accounts").
+                then().
+                assertThat().body("accounts.account.findAll{it.type=='checking'}", hasSize(3));
     }
 
 
     /*******************************************************
      * Perform a GET request to /xml/customer/12212/accounts
      * to get the list of accounts associated with customer
-     * 12212 in XML format
+     * 12212 in XML format≠≠+
      *
      * Assert that the list contains 2 accounts that have an
      * id starting with a '5'
@@ -102,8 +106,9 @@ public class RestAssuredExercises4Test {
     public void getAccountsForCustomer12212AsXml_checkNumberOfAccountIdsStartingWith5_shouldBe2() {
 
         given().
-            spec(requestSpec).
-        when().
-        then();
+                spec(requestSpec).
+                when().
+                get("/xml/customer/12212/accounts").
+                then().assertThat().body("accounts.account.id.grep(~/5.*/)", hasSize(2));
     }
 }

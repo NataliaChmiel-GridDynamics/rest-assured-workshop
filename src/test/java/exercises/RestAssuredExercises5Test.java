@@ -4,6 +4,8 @@ import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemp
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import dataentities.Account;
+import dataentities.AccountResponse;
+import dataentities.Customer;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
@@ -48,10 +50,16 @@ public class RestAssuredExercises5Test {
     @Test
     public void postAccountObject_checkResponseHttpStatusCode_expect201() {
 
+        Account account = new Account("savings");
+
         given().
-            spec(requestSpec).
-        when().
-        then();
+                spec(requestSpec).
+                and().
+                body(account).
+                when().
+                post("/customer/12212/accounts").
+                then().assertThat().statusCode(201);
+
     }
 
     /*******************************************************
@@ -66,10 +74,15 @@ public class RestAssuredExercises5Test {
 
     @Test
     public void getAccountsForCustomer12212_deserializeIntoList_checkListSize_shouldEqual3() {
+        AccountResponse accountResponse =
+                given().
+                        spec(requestSpec).
+                        when().get("/customer/12212/accounts").
+                        then().statusCode(200).
+                        and().extract().body().as(AccountResponse.class);
 
-        given().
-            spec(requestSpec).
-        when();
+
+        assertEquals(3, accountResponse.getAccounts().size());
     }
 
     /*******************************************************
@@ -90,8 +103,16 @@ public class RestAssuredExercises5Test {
     @Test
     public void postCustomerObject_checkReturnedFirstAndLastName_expectSuppliedValues() {
 
-        given().
-            spec(requestSpec).
-        when();
+        Customer customer = new Customer("Anna", "Grant");
+        Customer createdCustomer =
+
+                given().
+                        spec(requestSpec).
+                        and().body(customer).
+                        when().post("/customer").as(Customer.class);
+
+        assertEquals("Anna", createdCustomer.getFirstName());
+        assertEquals("Anna", createdCustomer.getFirstName());
+
     }
 }
